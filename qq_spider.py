@@ -3,7 +3,7 @@ import re
 import os
 import time
 
-path = './result_hjx' # 文件夹名字，会在脚本当前路径穿件该文件夹，可以修改
+path = './result_qq' # 文件夹名字，会在脚本当前路径穿件该文件夹，可以修改
 base_url = 'https://www.qqtn.com'
 time_interval = 1
 
