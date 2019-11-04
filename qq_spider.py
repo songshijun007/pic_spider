@@ -3,7 +3,7 @@ import re
 import os
 import time
 
-path = './result_qq' # 文件夹名字，会在脚本当前路径穿件该文件夹，可以修改
+path = './result_hjx' # 文件夹名字，会在脚本当前路径穿件该文件夹，可以修改
 base_url = 'https://www.qqtn.com'
 time_interval = 1
 
@@ -22,7 +22,15 @@ def mk_dir(path):
         
 def phrase(url, pattern):
     headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
-    rep = requests.get(url, headers=headers)
+    while True:
+        try:
+            rep = requests.get(url, headers=headers)
+            break
+        except:
+            print("Connection refused by the server..")
+            print("Let me sleep for 5 seconds")
+            time.sleep(5)
+            continue
     rep.encoding = 'gbk'
     results = re.findall(pattern, rep.text)
     time.sleep(time_interval)
@@ -31,7 +39,15 @@ def phrase(url, pattern):
 
 def phrase_S(url, pattern):
     headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
-    rep = requests.get(url, headers=headers)
+    while True:
+        try:
+            rep = requests.get(url, headers=headers)
+            break
+        except:
+            print("Connection refused by the server..")
+            print("Let me sleep for 5 seconds")
+            time.sleep(5)
+            continue
     rep.encoding = 'gbk'
     reg = re.compile(pattern, re.S)
     results = re.findall(reg, rep.text)
@@ -42,7 +58,15 @@ def phrase_S(url, pattern):
 # 先截取在提取
 def phrase_double(url, pattern_1, pattern_2):
     headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
-    rep = requests.get(url, headers=headers)
+    while True:
+        try:
+            rep = requests.get(url, headers=headers)
+            break
+        except:
+            print("Connection refused by the server..")
+            print("Let me sleep for 5 seconds")
+            time.sleep(5)
+            continue
     rep.encoding = 'gbk'
     aim = re.findall(pattern_1, rep.text)
     results = re.findall(pattern_2, aim[0])
@@ -52,7 +76,15 @@ def phrase_double(url, pattern_1, pattern_2):
 
 def phrase_double_S(url, pattern_1, pattern_2):
     headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
-    rep = requests.get(url, headers=headers)
+    while True:
+        try:
+            rep = requests.get(url, headers=headers)
+            break
+        except:
+            print("Connection refused by the server..")
+            print("Let me sleep for 5 seconds")
+            time.sleep(5)
+            continue
     rep.encoding = 'gbk'
     reg = re.compile(pattern_1, re.S)
     aim = re.findall(reg, rep.text)
@@ -100,7 +132,7 @@ for result_lv1 in results_lv1:
                            '导读：'+'\n'+
                            '描述文字：')
                     
-            pic_urls = phrase(url=base_url+result_lv2[0],pattern='<p align="center"><img src="(https.*?)"/></p>')
+            pic_urls = phrase(url=base_url+result_lv2[0],pattern='<p.*?align.*?center.*?><img.*?src="(https.*?)"/></p>')
             
             for pic_url in pic_urls:
                 name = pic_url.split('/')[-1]
