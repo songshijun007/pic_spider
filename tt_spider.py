@@ -5,20 +5,53 @@ import time
 
 path = './result_tt' # 文件夹名字，会在脚本当前路径穿件该文件夹，可以修改
 base_url = 'https://www.ivsky.com'
-time_interval = 1
+time_interval = 0
 
 # 断点重跑
 lv1_start = 1 # 大类如下，选择需要跑的起始位，默认1为全部跑
 # ['自然风光'，'城市旅游', '动物图片', '植物花卉', '海洋世界', '人物图片', '美食世界',
 #  '物品物件', '运动体育', '交通运输', '建筑环境', '装饰装修', '广告设计', '卡通图片', '节日图片', '设计素材', '艺术绘画', '其他类别']
 
+def proxy_rep(targetUrl):
+    while True:
+        try:
+            # 代理服务器
+            proxyHost = "http-dyn.abuyun.com"
+            proxyPort = "9020"
+
+            # 代理隧道验证信息
+            proxyUser = "HE5789T8MP2893JD" # 需要修改
+            proxyPass = "B27D12C88B9D7B45" # 需要修改
+
+            proxyMeta = "http://%(user)s:%(pass)s@%(host)s:%(port)s" % {
+              "host" : proxyHost,
+              "port" : proxyPort,
+              "user" : proxyUser,
+              "pass" : proxyPass,
+            }
+
+            proxies = {
+                "http"  : proxyMeta,
+                "https" : proxyMeta,
+            }
+
+            headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
+
+
+            resp = requests.get(targetUrl, proxies=proxies, headers=headers,timeout=3)
+            break
+        except:
+            print('无效代理ip重试')
+            continue
+    
+    return resp
 
 def mk_dir(path):
     if not os.path.exists(path):
         os.mkdir(path)
         
 def phrase(url, pattern):
-    rep = requests.get(url)
+    rep = proxy_rep(targetUrl=url)
     results = re.findall(pattern, rep.text)
     time.sleep(time_interval)
     
@@ -26,7 +59,7 @@ def phrase(url, pattern):
 
 # 先截取在提取
 def phrase_double(url, pattern_1, pattern_2):
-    rep = requests.get(url)
+    rep = proxy_rep(targetUrl=url)
     aim = re.findall(pattern_1, rep.text)
     results = re.findall(pattern_2, aim[0])
     time.sleep(time_interval)
@@ -35,7 +68,7 @@ def phrase_double(url, pattern_1, pattern_2):
 
 def download_pic(url, path_name):
     with open(path_name,'wb') as f:
-        f.write(requests.get(url).content)
+        f.write(proxy_rep(targetUrl=url).content)
         
     time.sleep(time_interval)
 
