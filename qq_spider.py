@@ -3,9 +3,9 @@ import re
 import os
 import time
 
-path = './result_hjx' # 文件夹名字，会在脚本当前路径穿件该文件夹，可以修改
+path = './result_qq' # 文件夹名字，会在脚本当前路径穿件该文件夹，可以修改
 base_url = 'https://www.qqtn.com'
-time_interval = 1
+time_interval = 0
 
 # 断点重跑
 lv1_start = 1 # 大类如下，选择需要跑的起始位，默认1为全部跑
@@ -15,39 +15,54 @@ lv1_start = 1 # 大类如下，选择需要跑的起始位，默认1为全部跑
 #  '动物图片', '霸气图片', '帅哥图片', '励志图片', '黑白图片', '背影图片', '悲伤的图片', '猫咪图片', '古风图片', 
 #  '闺蜜图片', '圣诞节图片', '婚纱图片', '性感图片', '伤心图片', '生日快乐图片', '亲吻图片', '难过的图片', '早安图片', '晚安图片']
 
+def proxy_rep(targetUrl):
+    while True:
+        try:
+            # 代理服务器
+            proxyHost = "http-dyn.abuyun.com"
+            proxyPort = "9020"
+
+            # 代理隧道验证信息
+            proxyUser = "HE5789T8MP2893JD"
+            proxyPass = "B27D12C88B9D7B45"
+
+            proxyMeta = "http://%(user)s:%(pass)s@%(host)s:%(port)s" % {
+              "host" : proxyHost,
+              "port" : proxyPort,
+              "user" : proxyUser,
+              "pass" : proxyPass,
+            }
+
+            proxies = {
+                "http"  : proxyMeta,
+                "https" : proxyMeta,
+            }
+
+            headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
+
+            resp = requests.get(targetUrl, proxies=proxies, headers=headers,timeout=3)
+            break
+        except:
+            print('无效代理ip重试')
+            continue
+    
+    return resp
 
 def mk_dir(path):
     if not os.path.exists(path):
         os.mkdir(path)
         
 def phrase(url, pattern):
-    headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
-    while True:
-        try:
-            rep = requests.get(url, headers=headers)
-            break
-        except:
-            print("Connection refused by the server..")
-            print("Let me sleep for 5 seconds")
-            time.sleep(5)
-            continue
+    rep = proxy_rep(targetUrl=url)
     rep.encoding = 'gbk'
+#     print(rep.text)
     results = re.findall(pattern, rep.text)
     time.sleep(time_interval)
     
     return results
 
 def phrase_S(url, pattern):
-    headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
-    while True:
-        try:
-            rep = requests.get(url, headers=headers)
-            break
-        except:
-            print("Connection refused by the server..")
-            print("Let me sleep for 5 seconds")
-            time.sleep(5)
-            continue
+    rep = proxy_rep(targetUrl=url)
     rep.encoding = 'gbk'
     reg = re.compile(pattern, re.S)
     results = re.findall(reg, rep.text)
@@ -57,16 +72,7 @@ def phrase_S(url, pattern):
 
 # 先截取在提取
 def phrase_double(url, pattern_1, pattern_2):
-    headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
-    while True:
-        try:
-            rep = requests.get(url, headers=headers)
-            break
-        except:
-            print("Connection refused by the server..")
-            print("Let me sleep for 5 seconds")
-            time.sleep(5)
-            continue
+    rep = proxy_rep(targetUrl=url)
     rep.encoding = 'gbk'
     aim = re.findall(pattern_1, rep.text)
     results = re.findall(pattern_2, aim[0])
@@ -75,16 +81,7 @@ def phrase_double(url, pattern_1, pattern_2):
     return results
 
 def phrase_double_S(url, pattern_1, pattern_2):
-    headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36'}
-    while True:
-        try:
-            rep = requests.get(url, headers=headers)
-            break
-        except:
-            print("Connection refused by the server..")
-            print("Let me sleep for 5 seconds")
-            time.sleep(5)
-            continue
+    rep = proxy_rep(targetUrl=url)
     rep.encoding = 'gbk'
     reg = re.compile(pattern_1, re.S)
     aim = re.findall(reg, rep.text)
@@ -95,7 +92,7 @@ def phrase_double_S(url, pattern_1, pattern_2):
 
 def download_pic(url, path_name):
     with open(path_name,'wb') as f:
-        f.write(requests.get(url).content)
+        f.write(proxy_rep(targetUrl=url).content)
         
     time.sleep(time_interval)
 
